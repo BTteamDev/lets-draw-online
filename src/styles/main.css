@@ -1,0 +1,67 @@
+@import url('./variables.css');
+@import url('./tags.css');
+@import url('./admin.css');
+
+html {
+    background: var(--footer-bg);
+}
+
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+* {
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif;
+}
+
+*::selection {
+    background-color: var(--accent-blue);
+    color: white;
+}
+
+*::-webkit-scrollbar {
+    width: 7px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--accent-blue);
+    border-radius: 70px;
+    border: 3px solid var(--glass-border);
+}
+
+option {
+    color: black !important;
+}
+
+.dropdown-divider {
+    width: 100%;
+    height: 1px;
+    background-color: black;
+    margin: 15px 0 10px 0;
+}
+
+.verify-badge.dev,
+.verify-badge.superadmin,
+.verify-badge.admin {
+    color: var(--color-dev);
+}
+
+.verify-badge.mod {
+    color: var(--color-mod);
+}
+
+.verify-badge i {
+    pointer-events: none;
+}
+
+a {
+    -webkit-user-drag: none;
+    user-select: none;
+}

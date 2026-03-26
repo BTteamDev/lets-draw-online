@@ -1,0 +1,38 @@
+.tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: white;
+}
+
+.tag.owner {
+    background: #ffeaa7b9;
+    color: #d63031;
+}
+
+.tag.editor {
+    background: #81ecec68;
+    color: #00b894;
+}
+
+.tag.viewer {
+    background: #6d787d68;
+    color: #636e72;
+}
+
+[data-theme="dark"] .tag.viewer {
+    background: #a1afb668;
+    color: #9fa9ad;
+}
+
+.tag.dev, .tag.admin, .tag.superadmin {
+    background: #bd3e91;
+    color: white;
+}
+
+.tag.mod {
+    background: #5f2f8f;
+    color: white;
+}

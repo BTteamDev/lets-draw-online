@@ -1,0 +1,85 @@
+:root {
+    --bg-main: #f4f7f6;
+    --bg-accent: #ffffff;
+    --accent-blue: #3498db;
+    --accent-purple: #9b59b6;
+
+    --card-bg: #ffffff;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --radius-main: 12px;
+    --radius-sm: 8px;
+    --border-circle: 50%;
+
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --text-on-dark: #ffffff;
+    --text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+
+    --header-bg: rgba(255, 255, 255, 0.8);
+    --footer-bg: rgba(255, 255, 255, 0.03);
+
+    --color-admin: #eb4d4b;
+    --color-editor: #f0932b;
+    --color-viewer: #6ab04c;
+    --color-owner: #686de0;
+
+    --color-online: #2ecc71;
+    --color-offline: #95a5a6;
+    --color-danger: #ff4757;
+    --color-warning: #ffa502;
+    --color-info: #3f5c9a;
+    --color-success: #39863b;
+
+    --color-dev: #bd3e91;
+    --color-mod: #5f2f8f;
+
+    --toolbar-bg: rgba(255, 255, 255, 0.9);
+    --chat-log-bg: rgba(0, 0, 0, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-blur: blur(10px);
+
+    --input-bg: #f1f2f6;
+    --btn-transition: all 0.2s ease;
+}
+
+[data-theme="dark"] {
+    --bg-main: #0f172a;
+    --bg-accent: #1e293b;
+    --accent-blue: #238ab6;
+    --accent-purple: #855ab1;
+
+    --card-bg: rgb(30, 41, 59);
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    --radius-main: 12px;
+    --radius-sm: 8px;
+    --border-circle: 50%;
+
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-on-dark: #ffffff;
+    --text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+
+    --header-bg: rgba(15, 23, 42, 0.8);
+    --footer-bg: rgb(7 13 24);
+
+    --color-admin: #ff7675;
+    --color-editor: #fab1a0;
+    --color-viewer: #55efc4;
+    --color-owner: #a29bfe;
+
+    --color-online: #00b894;
+    --color-offline: #636e72;
+    --color-danger: #ff4d4d;
+
+    --toolbar-bg: rgba(30, 41, 59, 0.85);
+    --chat-log-bg: rgba(0, 0, 0, 0.4);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(12px);
+
+    --input-bg: #1e293b;
+    --btn-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
