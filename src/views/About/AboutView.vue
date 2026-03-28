@@ -76,7 +76,7 @@ import { ref, onMounted } from 'vue';
 import { credits, type CreditMember } from '@/ts/credits';
 import { userAPI } from '@/ts/utils/api';
 import { marked } from 'marked';
-import changelogRaw from '@/CHANGELOG.md?raw';
+import changelogRaw from './CHANGELOG.md?raw';
 
 const changelogHtml = ref('');
 const parseChangelog = async () => {
