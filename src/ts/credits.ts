@@ -17,8 +17,8 @@ export const credits: CreditMember[] = [
         socials: [
             { icon: "fa-brands fa-github", url: "https://github.com/BTteamDev", label: "GitHub" },
             { icon: "fa-solid fa-envelope", url: "mailto:bogdantorr@gmail.com", label: "Email" },
-            { icon: "fa-brands fa-vk", url: "vk.ru/bodutop", label: "VK" },
-            { icon: "fa-brands fa-telegram", url: "t.me/bodutop", label: "TG" }
+            { icon: "fa-brands fa-vk", url: "https://vk.ru/bodutop", label: "VKontakte" },
+            { icon: "fa-brands fa-telegram", url: "https://t.me/bodutop", label: "Telegram" }
         ]
     },
 ];
