@@ -82,7 +82,6 @@ const isProcessing = ref(false);
 const isOwner = computed(() => props.board?.creator?._id === currentUserId);
 
 const creatorRole = computed(() => {
-    console.log(props.board.creator?.systemRole || (props.board.creator as any)?.role || 'viewer')
     return props.board.creator?.systemRole || (props.board.creator as any)?.role || 'viewer';
 });
 
@@ -103,7 +102,7 @@ const deleteBoard = async () => {
         const savedUser = localStorage.getItem('user');
         const userId = savedUser ? JSON.parse(savedUser).id : null;
 
-        await api.delete(`https://drawing-server-mbnr.onrender.com/api/boards/${props.board._id}`, {
+        await api.delete(`http://localhost:5000/api/boards/${props.board._id}`, {
             data: { userId }
         });
 
@@ -127,7 +126,7 @@ const toggleLike = async () => {
     likesCount.value += isLiked.value ? 1 : -1;
 
     try {
-        const res = await api.post(`https://drawing-server-mbnr.onrender.com/api/boards/${props.board._id}/toggle-like`, {
+        const res = await api.post(`http://localhost:5000/api/boards/${props.board._id}/toggle-like`, {
             userId: currentUserId
         });
         likesCount.value = res.data.likesCount;
@@ -143,6 +142,12 @@ const toggleLike = async () => {
 </script>
 
 <style scoped>
+.board-card-template-wrapper {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
 .board-card {
     background: var(--card-bg);
     border-radius: var(--radius-main);
@@ -415,6 +420,51 @@ h3 {
 
     100% {
         transform: scale(1.1);
+    }
+}
+
+@media (max-width: 480px) {
+    .board-card-template-wrapper {
+        max-width: 100%;
+        padding: 0 5px;
+    }
+
+    .card-preview {
+        height: 140px;
+    }
+
+    .card-content {
+        padding: 12px;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    .author {
+        margin-bottom: 10px;
+    }
+
+    .card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .join-btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+@media (min-width: 768px) {
+    .board-card-template-wrapper {
+        max-width: 380px;
     }
 }
 </style>
