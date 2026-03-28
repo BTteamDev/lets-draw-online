@@ -4,7 +4,7 @@
             <aside class="sidebar left-panel" :class="{ 'is-hidden': isLeftCollapsed }">
                 <div class="sidebar-header">
                     <div class="room-info">
-                        <h2 class="board-title">
+                        <h2 class="board-title" :title="boardTitle">
                             <i class="fa-solid fa-chalkboard-user"></i> {{ boardTitle }}
                         </h2>
                         <span class="online-count">

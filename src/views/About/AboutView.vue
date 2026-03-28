@@ -9,6 +9,20 @@
                     Площадка для рисования вместе онлайн. Заходи, рисуй, общайся, сохраняй свои шедевры!
                     Мы создали пространство, где творчество не знает границ, а каждый пиксель передается мгновенно.
                 </p>
+                <div class="dev-warning-box">
+                    <div class="warning-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="warning-content">
+                        <strong>Сайт в активной разработке!</strong>
+                        <p>
+                            На данный момент всё работает в тестовом режиме и может быть нестабильно.
+                            Из-за бесплатного хостинга возможны заторможенные запуски и задержки.
+                            По всем вопросам, багам и проблемам пишите напрямую разработчику:
+                            <a href="https://t.me/bodutop" target="_blank" class="dev-link">@bodutop</a>
+                        </p>
+                    </div>
+                </div>
             </section>
 
             <section class="card glass section-card">
@@ -80,14 +94,6 @@ import { marked } from 'marked';
 const changelogHtml = ref('');
 const changelogRaw = ref('');
 
-const parseChangelog = async () => {
-    try {
-        changelogHtml.value = await marked.parse(changelogRaw.value);
-    } catch (e) {
-        changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
-    }
-};
-
 interface DisplayMember extends CreditMember {
     username: string;
     avatarUrl: string;
@@ -128,13 +134,14 @@ watch(changelogRaw, async (newValue) => {
 
 onMounted(async () => {
     loadTeamData();
-    const modules = import.meta.glob('./CHANGELOG.md', { as: 'raw', eager: true });
-    const rawContent = modules['./CHANGELOG.md'];
+    const modules = import.meta.glob('./**/*.md', { as: 'raw', eager: true });
+    const changelogKey = Object.keys(modules).find(key => key.endsWith('CHANGELOG.md'));
+    const rawContent = changelogKey ? modules[changelogKey] : null;
+
     if (rawContent) {
         changelogRaw.value = rawContent;
     } else {
-        changelogRaw.value = 'Журнал изменений пуст или не найден.';
-        console.error('Доступные модули:', Object.keys(modules));
+        changelogRaw.value = 'Журнал изменений пуст или не найден...';
     }
 });
 </script>
@@ -293,6 +300,75 @@ onMounted(async () => {
     overflow-y: auto;
 }
 
+.dev-warning-box {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: rgba(255, 71, 87, 0.1);
+    /* Полупрозрачный красный */
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    animation: pulse-border 3s infinite;
+}
+
+.warning-icon {
+    color: #ff4757;
+    font-size: 1.5rem;
+    margin-top: 2px;
+}
+
+.warning-content {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.warning-content strong {
+    display: block;
+    color: #ff4757;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.warning-content p {
+    margin: 0;
+    color: var(--text-main);
+}
+
+.dev-link {
+    color: #ff4757;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 2px 6px;
+    background: rgba(255, 71, 87, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.dev-link:hover {
+    background: #ff4757;
+    color: white;
+}
+
+@keyframes pulse-border {
+    0% {
+        box-shadow: 0 0 0px rgba(255, 71, 87, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.2);
+    }
+
+    100% {
+        box-shadow: 0 0 0px rgba(255, 71, 87, 0);
+    }
+}
+
 @media (max-width: 1000px) {
     .about-page {
         grid-template-columns: 1fr;
@@ -300,6 +376,18 @@ onMounted(async () => {
 
     .about-sidebar {
         order: -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .dev-warning-box {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .warning-icon {
+        margin-bottom: 10px;
     }
 }
 </style>
