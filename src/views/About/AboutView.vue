@@ -135,15 +135,17 @@ watch(changelogRaw, async (newValue) => {
 
 onMounted(async () => {
     loadTeamData();
-    if (changelogPath) {
-        changelogRaw.value = changelogPath;
-    }
-    const modules = import.meta.glob('./*.md', { as: 'raw' });
-    const loader = modules['./CHANGELOG.md'];
-    
-    if (loader) {
-        const content = await loader();
-        changelogRaw.value = content as string;
+    try {
+        const changelogUrl = new URL('./CHANGELOG.md', import.meta.url).href;
+        const response = await fetch(changelogUrl);
+        if (response.ok) {
+            changelogRaw.value = await response.text();
+        } else {
+            throw new Error('File not found');
+        }
+    } catch (e) {
+        console.error('Ошибка загрузки MD:', e);
+        changelogRaw.value = 'Не удалось загрузить журнал изменений.';
     }
 });
 </script>
