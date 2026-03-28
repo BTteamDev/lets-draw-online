@@ -12,7 +12,7 @@ export interface CreditMember {
 
 export const credits: CreditMember[] = [
     {
-        userId: "69b573770a449a79ecb52745",
+        userId: "69c542537059afa59cfe8b9e",
         position: "Team Lead / Lead Fullstack Developer",
         socials: [
             { icon: "fa-brands fa-github", url: "https://github.com/BTteamDev", label: "GitHub" },

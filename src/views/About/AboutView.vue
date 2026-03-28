@@ -79,13 +79,14 @@ import { marked } from 'marked';
 
 const changelogHtml = ref('');
 const changelogRaw = ref('');
-// const parseChangelog = async () => {
-//     try {
-//         changelogHtml.value = await marked.parse(changelogRaw);
-//     } catch (e) {
-//         changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
-//     }
-// };
+
+const parseChangelog = async () => {
+    try {
+        changelogHtml.value = await marked.parse(changelogRaw.value);
+    } catch (e) {
+        changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
+    }
+};
 
 interface DisplayMember extends CreditMember {
     username: string;
@@ -123,6 +124,7 @@ onMounted( async () => {
     loadTeamData();
     const modules = import.meta.glob('./CHANGELOG.md', { as: 'raw', eager: true });
     changelogRaw.value = modules['./CHANGELOG.md'] || 'Загрузка изменений...';
+    parseChangelog();
 });
 </script>
 
