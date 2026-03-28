@@ -90,6 +90,7 @@ import { ref, onMounted, watch } from 'vue';
 import { credits, type CreditMember } from '@/ts/credits';
 import { userAPI } from '@/ts/utils/api';
 import { marked } from 'marked';
+import changelogPath from './CHANGELOG.md?raw';
 
 const changelogHtml = ref('');
 const changelogRaw = ref('');
@@ -134,15 +135,15 @@ watch(changelogRaw, async (newValue) => {
 
 onMounted(async () => {
     loadTeamData();
-    const modules = import.meta.glob('./**/*.md', { as: 'raw', eager: true });
-    console.log('найденные md модули:', Object.keys(modules));
-    const changelogKey = Object.keys(modules).find(key => key.endsWith('CHANGELOG.md'));
-    const rawContent = changelogKey ? modules[changelogKey] : null;
-
-    if (rawContent) {
-        changelogRaw.value = rawContent;
-    } else {
-        changelogRaw.value = 'Журнал изменений пуст или не найден...';
+    if (changelogPath) {
+        changelogRaw.value = changelogPath;
+    }
+    const modules = import.meta.glob('./*.md', { as: 'raw' });
+    const loader = modules['./CHANGELOG.md'];
+    
+    if (loader) {
+        const content = await loader();
+        changelogRaw.value = content as string;
     }
 });
 </script>
