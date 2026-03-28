@@ -135,6 +135,7 @@ watch(changelogRaw, async (newValue) => {
 onMounted(async () => {
     loadTeamData();
     const modules = import.meta.glob('./**/*.md', { as: 'raw', eager: true });
+    console.log('найденные md модули:', Object.keys(modules));
     const changelogKey = Object.keys(modules).find(key => key.endsWith('CHANGELOG.md'));
     const rawContent = changelogKey ? modules[changelogKey] : null;
 
