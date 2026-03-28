@@ -113,7 +113,6 @@ const { addNotify } = useNotifications();
 
 const user = computed(() => {
     const u = authState.user;
-    console.log('Данные пользователя в стейте:', u);
     return {
         id: u?._id || u?.id || '',
         username: u?.username || 'Загрузка...',

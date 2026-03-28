@@ -298,12 +298,12 @@ onMounted(fetchBoards);
     cursor: pointer;
 }
 
-@media (max-width: 768px) {
+/*@media (max-width: 768px) {
     .controls-panel {
         flex-direction: column;
         align-items: stretch;
     }
-}
+}*/
 
 @keyframes fadeIn {
     from {
@@ -317,16 +317,61 @@ onMounted(fetchBoards);
     }
 }
 
-@media (max-width: 600px) {
-    .boards-header {
-        flex-direction: column;
+@media (max-width: 768px) {
+    .boards-page {
+        padding: 20px 15px;
+    }
+
+    .header-text h1 {
+        font-size: 1.8rem;
+        justify-content: center;
+    }
+
+    .controls-panel {
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tabs button {
+        justify-content: center;
+        padding: 12px 5px;
+        font-size: 0.9rem;
+    }
+
+    .sort-wrapper {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sort-select {
+        flex: 1;
         text-align: center;
+    }
+
+    .boards-grid {
+        grid-template-columns: 1fr;
         gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-text h1 {
+        font-size: 1.5rem;
+    }
+    
+    .header-text p {
+        font-size: 0.9rem;
     }
 
     .create-btn {
-        width: 100%;
-        justify-content: center;
+        padding: 12px;
+        font-size: 0.95rem;
     }
 }
 </style>

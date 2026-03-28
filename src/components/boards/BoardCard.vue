@@ -127,7 +127,7 @@ const toggleLike = async () => {
     likesCount.value += isLiked.value ? 1 : -1;
 
     try {
-        const res = await api.post(`https://drawing-server-mbnr.onrender.com/${props.board._id}/toggle-like`, {
+        const res = await api.post(`https://drawing-server-mbnr.onrender.com/api/boards/${props.board._id}/toggle-like`, {
             userId: currentUserId
         });
         likesCount.value = res.data.likesCount;

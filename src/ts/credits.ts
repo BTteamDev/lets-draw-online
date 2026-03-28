@@ -19,11 +19,4 @@ export const credits: CreditMember[] = [
             { icon: "fa-solid fa-envelope", url: "mailto:bogdantorr@gmail.com", label: "Email" }
         ]
     },
-    {
-        userId: "69b597f92c1cdf146dcba308",
-        position: "Moderator",
-        socials: [
-            
-        ]
-    },
 ];

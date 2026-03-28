@@ -74,7 +74,7 @@
             </div>
         </div>
     </footer>
-    <NotificationList/>
+    <NotificationList />
 </template>
 
 <script setup lang="ts">
@@ -98,7 +98,7 @@ const navLinks = [
 ];
 
 const isAdmin = computed(() => {
-    const user = authState.user;    
+    const user = authState.user;
     if (!user) return false;
     const currentRole = user.systemRole || user.role;
     return ['admin', 'superadmin'].includes(currentRole);
@@ -409,11 +409,62 @@ fade-enter-active,
     opacity: 0;
 }
 
+@media (max-width: 768px) {
+    .main-header {
+        padding: 0 15px;
+        height: 60px;
+    }
+
+    .logo h1 {
+        display: none;
+    }
+
+    .nav-item span,
+    .logout-btn span {
+        display: none;
+    }
+
+    .nav-item {
+        padding: 8px 12px;
+    }
+
+    .main-nav {
+        gap: 4px;
+    }
+
+    .user-actions {
+        gap: 10px;
+    }
+
+    .user-brief span {
+        display: none;
+    }
+}
+
 @media (max-width: 480px) {
     .footer-content {
         flex-direction: column;
-        gap: 10px;
-        text-align: center;
+        gap: 15px;
+        padding: 20px 0;
+    }
+
+    .footer-left {
+        align-items: center;
+    }
+
+    .footer-link,
+    .links {
+        margin-left: 0;
+    }
+
+    .version-badge {
+        margin-right: 0;
+    }
+
+    .nav-item i,
+    .theme-toggle,
+    .logout-btn i {
+        font-size: 1.3rem;
     }
 }
 </style>

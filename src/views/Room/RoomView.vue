@@ -1,7 +1,7 @@
 <template>
     <div class="room-view-wrapper">
         <div class="room-layout">
-            <aside class="sidebar left-panel">
+            <aside class="sidebar left-panel" :class="{ 'is-hidden': isLeftCollapsed }">
                 <div class="sidebar-header">
                     <div class="room-info">
                         <h2 class="board-title">
@@ -11,6 +11,9 @@
                             <i class="fa-solid fa-circle"></i> {{ roomUsers.length }} в сети
                         </span>
                     </div>
+                    <button class="collapse-btn" @click="isLeftCollapsed = true" title="Скрыть список">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
                     <button @click="router.push('/')" class="exit-btn" title="Выйти из комнаты">
                         <i class="fa-solid fa-door-open"></i>
                     </button>
@@ -120,6 +123,9 @@
             </aside>
 
             <main class="canvas-area">
+                <button v-if="isLeftCollapsed" class="expand-btn expand-left-btn" @click="isLeftCollapsed = false">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
                 <button v-if="isCollapsed" class="expand-chat-btn" @click="toggleChat" title="Развернуть чат">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
@@ -183,6 +189,7 @@ const settings = ref({ color: '#000000', width: 5, tool: 'brush' as ToolType, op
 const boardTitle = ref('...');
 const redoStack = ref<Line[]>([]);
 const isCollapsed = ref(false);
+const isLeftCollapsed = ref(false);
 const canvasComponent = ref<InstanceType<typeof ArtCanvas> | null>(null);
 const isSaving = ref(false);
 
@@ -304,7 +311,7 @@ const currentUserSystemRole = computed(() => {
 
 const toggleBan = async (targetUser: any) => {
     try {
-        const res = await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${targetUser.id}/ban`, {}, {
+        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/ban`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
 
@@ -322,7 +329,7 @@ const toggleBan = async (targetUser: any) => {
 
 const toggleMute = async (targetUser: any) => {
     try {
-        const res = await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${targetUser.id}/mute`, {}, {
+        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/mute`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
         targetUser.isMuted = res.data.isMuted;
@@ -337,7 +344,7 @@ const toggleNote = (user: any) => {
 
 const saveNote = async (user: any) => {
     try {
-        await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${user.id}/note`, {
+        await api.patch(`http://localhost:5000/api/admin/users/${user.id}/note`, {
             note: user.note
         }, {
             headers: { 'x-user-id': currentUserId }
@@ -399,6 +406,10 @@ const handleLineFinished = (line: Line) => {
 };
 
 onUnmounted(() => {
+    if (window.innerWidth < 1024) {
+        isLeftCollapsed.value = true;
+        isCollapsed.value = true;
+    }
     socket.disconnect();
 });
 </script>
@@ -417,18 +428,35 @@ onUnmounted(() => {
 }
 
 .sidebar {
-    width: 320px;
+    width: 300px;
     background: var(--card-bg);
     border-right: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
     z-index: 10;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                margin 0.3s ease, 
+                opacity 0.2s ease;
 }
 
 .left-panel {
     border-right: 1px solid var(--glass-border);
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
+}
+
+.left-panel.is-hidden {
+    width: 0;
+    margin-left: -1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.right-panel.is-hidden {
+    width: 0;
+    margin-right: -1px;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .right-panel {
@@ -444,6 +472,26 @@ onUnmounted(() => {
     opacity: 0;
     pointer-events: none;
 }
+
+.expand-btn {
+    position: absolute;
+    top: 85px;
+    width: 40px;
+    height: 40px;
+    z-index: 100;
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--accent-blue);
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.expand-left-btn { left: 20px; }
+.expand-right-btn { right: 20px; }
 
 .collapse-btn,
 .expand-chat-btn {
@@ -575,11 +623,14 @@ onUnmounted(() => {
     position: relative;
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
 }
 
 .avatar {
-    min-width: 100%;
-    height: 100%;
+    width: 40px; 
+    height: 40px;
+    flex-shrink: 0;
+    
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--glass-border);
@@ -588,6 +639,7 @@ onUnmounted(() => {
     align-items: center;
     background-color: var(--accent-blue);
     color: white;
+    overflow: hidden;
 }
 
 .status-dot {
@@ -886,5 +938,46 @@ onUnmounted(() => {
 
 .menu-dots {
     color: var(--text-main);
+}
+
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 260px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        position: absolute;
+        height: 100%;
+        z-index: 200;
+    }
+    
+    .left-panel { left: 0; }
+    .right-panel { right: 0; }
+
+    .room-layout::before {
+        content: '';
+        display: v-bind('(!isCollapsed || !isLeftCollapsed) ? "block" : "none"');
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 150;
+    }
+}
+
+@media (max-width: 600px) {
+    .sidebar {
+        width: 100%;
+    }
+    
+    .toolbar-container {
+        padding: 10px;
+        scale: 0.9;
+    }
+    
+    .art-board {
+        padding: 10px;
+    }
 }
 </style>
