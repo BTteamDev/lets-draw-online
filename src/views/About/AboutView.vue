@@ -90,7 +90,6 @@ import { ref, onMounted, watch } from 'vue';
 import { credits, type CreditMember } from '@/ts/credits';
 import { userAPI } from '@/ts/utils/api';
 import { marked } from 'marked';
-import changelogPath from './CHANGELOG.md?raw';
 
 const changelogHtml = ref('');
 const changelogRaw = ref('');
