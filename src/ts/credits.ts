@@ -16,7 +16,9 @@ export const credits: CreditMember[] = [
         position: "Team Lead / Lead Fullstack Developer",
         socials: [
             { icon: "fa-brands fa-github", url: "https://github.com/BTteamDev", label: "GitHub" },
-            { icon: "fa-solid fa-envelope", url: "mailto:bogdantorr@gmail.com", label: "Email" }
+            { icon: "fa-solid fa-envelope", url: "mailto:bogdantorr@gmail.com", label: "Email" },
+            { icon: "fa-brands fa-vk", url: "vk.ru/bodutop", label: "VK" },
+            { icon: "fa-brands fa-telegram", url: "t.me/bodutop", label: "TG" }
         ]
     },
 ];
