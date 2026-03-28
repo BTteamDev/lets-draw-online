@@ -76,16 +76,16 @@ import { ref, onMounted } from 'vue';
 import { credits, type CreditMember } from '@/ts/credits';
 import { userAPI } from '@/ts/utils/api';
 import { marked } from 'marked';
-import changelogRaw from './CHANGELOG.md?raw';
 
 const changelogHtml = ref('');
-const parseChangelog = async () => {
-    try {
-        changelogHtml.value = await marked.parse(changelogRaw);
-    } catch (e) {
-        changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
-    }
-};
+const changelogRaw = ref('');
+// const parseChangelog = async () => {
+//     try {
+//         changelogHtml.value = await marked.parse(changelogRaw);
+//     } catch (e) {
+//         changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
+//     }
+// };
 
 interface DisplayMember extends CreditMember {
     username: string;
@@ -119,9 +119,10 @@ const loadTeamData = async () => {
     members.value = loadedMembers;
 };
 
-onMounted(() => {
+onMounted( async () => {
     loadTeamData();
-    parseChangelog();
+    const modules = import.meta.glob('./CHANGELOG.md', { as: 'raw', eager: true });
+    changelogRaw.value = modules['./CHANGELOG.md'] || 'Загрузка изменений...';
 });
 </script>
 
