@@ -425,7 +425,7 @@ h3 {
 
 @media (max-width: 480px) {
     .board-card-template-wrapper {
-        max-width: 100%;
+        max-width: 420px;
         padding: 0 5px;
     }
 

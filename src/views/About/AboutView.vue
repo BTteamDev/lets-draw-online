@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { credits, type CreditMember } from '@/ts/credits';
 import { userAPI } from '@/ts/utils/api';
 import { marked } from 'marked';
@@ -120,11 +120,22 @@ const loadTeamData = async () => {
     members.value = loadedMembers;
 };
 
-onMounted( async () => {
+watch(changelogRaw, async (newValue) => {
+    if (newValue && newValue !== 'Загрузка изменений...') {
+        changelogHtml.value = await marked.parse(newValue);
+    }
+});
+
+onMounted(async () => {
     loadTeamData();
     const modules = import.meta.glob('./CHANGELOG.md', { as: 'raw', eager: true });
-    changelogRaw.value = modules['./CHANGELOG.md'] || 'Загрузка изменений...';
-    parseChangelog();
+    const rawContent = modules['./CHANGELOG.md'];
+    if (rawContent) {
+        changelogRaw.value = rawContent;
+    } else {
+        changelogRaw.value = 'Журнал изменений пуст или не найден.';
+        console.error('Доступные модули:', Object.keys(modules));
+    }
 });
 </script>
 
