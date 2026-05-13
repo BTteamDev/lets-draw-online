@@ -101,13 +101,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 import { boardAPI, userAPI } from '@/ts/utils/api';
 import { useNotifications } from '@/ts/utils/notifications';
 import { ErrorRegistry, SuccessRegistry } from '@/ts/utils/messages';
 import { api } from '@/ts/utils/api';
 import NotificationList from '@/components/notification/NotificationList.vue';
-import { updateUsernameInStore } from '@/ts/store/auth';
+import { updateUsernameInStore } from '@/ts/stores/auth';
 
 const { addNotify } = useNotifications();
 

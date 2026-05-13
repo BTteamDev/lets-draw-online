@@ -1,4 +1,4 @@
-export const getTooltipText = (role: string) => {
+export const getTooltipTextBadge = (role: string) => {
     const texts: Record<string, string> = {
         'superadmin': 'Владелец платформы',
         'admin': 'Администратор платформы',

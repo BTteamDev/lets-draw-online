@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { authAPI } from '@/ts/utils/api';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 import NotificationList from '../notification/NotificationList.vue';
 import { useNotifications } from '@/ts/utils/notifications';
 import { ErrorRegistry, InfoRegistry } from '@/ts/utils/messages';
@@ -76,7 +76,8 @@ const handleSubmit = async () => {
 				avatarUrl: res.data.avatarUrl,
 				role: res.data.role,
 				isBanned: res.data.isBanned,
-				isMuted: res.data.isMuted
+				isMuted: res.data.isMuted,
+				lastIp: res.data.lastIp
 			};
 			localStorage.setItem('user', JSON.stringify(userData));
 
@@ -250,13 +251,6 @@ h2 {
 
 	75% {
 		transform: translateX(10px);
-	}
-}
-
-@media (max-width: 480px) {
-	.auth-card {
-		margin: 20px;
-		padding: 30px 20px;
 	}
 }
 </style>

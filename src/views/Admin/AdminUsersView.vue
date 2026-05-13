@@ -1,74 +1,78 @@
 <template>
-<div class="admin-users-template-wrapper">
+    <div class="admin-users-template-wrapper">
         <div class="admin-users">
-        <div class="admin-header">
-            <h2>
-                <i id="icon" class="fa-solid fa-circle-user"></i>
-                Управление пользователями
-            </h2>
-            <p>Найдено пользователей:
-                <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin"></i>
-                {{ isLoading ? '' : users.length }}
-            </p>
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input v-model="searchQuery" @input="fetchUsers"
-                    placeholder="Поиск... (поддержка @name=, @email=, @id=)" />
+            <div class="admin-header">
+                <h2>
+                    <i id="icon" class="fa-solid fa-circle-user"></i>
+                    Управление пользователями
+                </h2>
+                <p>Найдено пользователей:
+                    <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin"></i>
+                    {{ isLoading ? '' : users.length }}
+                </p>
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input v-model="searchQuery" @input="fetchUsers"
+                        placeholder="Поиск... (поддержка @name=, @email=, @id=)" />
+                </div>
             </div>
-        </div>
 
-        <div class="user-list">
-            <div v-for="user in users" :key="user._id" class="user-card">
-                <div class="user-main-info">
-                    <img v-if="user.avatarUrl" :src="user.avatarUrl" class="user-avatar" />
-                    <div class="user-avatar" v-if="!user.avatarUrl">{{ user.username[0]?.toUpperCase() }}</div>
-                    <div class="user-details">
-                        <router-link :to="`/admin/users/${user._id}`" style="text-decoration: none;"><span
-                                class="username">{{ user.username }}</span></router-link>
-                        <span class="email">{{ user.email }}</span>
-                    </div>
-                </div>
-
-                <div class="user-meta">
-                    <span class="origin-tag">IP: ???.???.???.???</span>
-                    <span v-if="user.role !== 'viewer'" :class="['role-badge', user.role]">{{ user.role }}</span>
-                </div>
-
-                <div class="user-actions">
-                    <div class="note-container">
-                        <button @click="toggleNote(user)" class="note-btn" :class="{ 'has-note': user.note }">
-                            <i class="fa-solid fa-note-sticky"></i>
-                        </button>
-
-                        <div v-if="activeNoteId === user._id" class="note-edit-popover">
-                            <textarea v-model="user.note" @blur="saveNote(user)" placeholder="Текст заметки..."
-                                autofocus></textarea>
+            <div class="user-list">
+                <div v-for="user in users" :key="user._id" class="user-card">
+                    <div class="user-main-info">
+                        <img v-if="user.avatarUrl" :src="user.avatarUrl" class="user-avatar" />
+                        <div class="user-avatar" v-if="!user.avatarUrl">{{ user.username[0]?.toUpperCase() }}</div>
+                        <div class="user-details">
+                            <router-link :to="`/admin/users/${user._id}`" style="text-decoration: none;"><span
+                                    class="username">{{ user.username }}</span></router-link>
+                            <span class="email">{{ user.email }}</span>
                         </div>
                     </div>
 
-                    <div class="action-buttons">
-                        <button class="btn-ban" title="Бан" @click="toggleBan(user)"
-                            :style="user.isBanned ? 'color: var(--color-danger)' : ''"><i
-                                class="fa-solid fa-ban"></i></button>
-                        <button class="btn-mute" title="Мут" @click="toggleMute(user)"
-                            :style="user.isMuted ? 'color: var(--color-danger)' : ''"><i
-                                class="fa-solid fa-microphone-slash"></i></button>
-                        <button class="btn-shadow" title="Shadowban"><i class="fa-solid fa-eye-slash"></i></button>
-                        <button class="btn-delete" @click="deleteUser(user._id)" title="Удалить аккаунт"><i
-                                class="fa-solid fa-trash-can"></i></button>
+                    <div class="user-meta">
+                        <span class="origin-tag"
+                            :title="`Последний IP: ${(user.lastIp === '::1' ? `${user.lastIp} (ЛОКАЛЬНЫЙ)` : user.lastIp) || 'НЕТ IP'}`">
+                            <i class="fa-solid fa-network-wired"></i>
+                            {{ (user.lastIp === '::1' ? 'LOCAL' : user.lastIp) || 'UNKNOWN' }}
+                        </span>
+                        <span v-if="user.role !== 'viewer'" :class="['role-badge', user.role]">{{ user.role }}</span>
+                    </div>
+
+                    <div class="user-actions">
+                        <div class="note-container">
+                            <button @click="toggleNote(user)" class="note-btn" :class="{ 'has-note': user.note }">
+                                <i class="fa-solid fa-note-sticky"></i>
+                            </button>
+
+                            <div v-if="activeNoteId === user._id" class="note-edit-popover">
+                                <textarea v-model="user.note" @blur="saveNote(user)" placeholder="Текст заметки..."
+                                    autofocus></textarea>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn-ban" title="Бан" @click="toggleBan(user)"
+                                :style="user.isBanned ? 'color: var(--color-danger)' : ''"><i
+                                    class="fa-solid fa-ban"></i></button>
+                            <button class="btn-mute" title="Мут" @click="toggleMute(user)"
+                                :style="user.isMuted ? 'color: var(--color-danger)' : ''"><i
+                                    class="fa-solid fa-microphone-slash"></i></button>
+                            <button class="btn-shadow" title="Shadowban"><i class="fa-solid fa-eye-slash"></i></button>
+                            <button class="btn-delete" @click="deleteUser(user._id)" title="Удалить аккаунт"><i
+                                    class="fa-solid fa-trash-can"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <NotificationList />
     </div>
-    <NotificationList />
-</div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { api } from '@/ts/utils/api';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 import { useNotifications } from '@/ts/utils/notifications';
 import NotificationList from '@/components/notification/NotificationList.vue';
 import type { AdminUser } from '@/ts/utils/interfaces'
@@ -139,6 +143,7 @@ const fetchUsers = async () => {
             params: { search: searchQuery.value },
             headers: { 'x-user-id': authState.user?.id }
         });
+        console.log('Данные первого юзера:', res.data[0]);
         users.value = res.data;
     } catch (e) {
         addNotify('error', 'Ошибка загрузки пользователей');
@@ -247,11 +252,15 @@ onMounted(fetchUsers);
 }
 
 .origin-tag {
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     font-size: 0.8rem;
-    background: rgba(0, 0, 0, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--accent-blue);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .action-buttons {

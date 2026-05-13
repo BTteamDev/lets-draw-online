@@ -94,6 +94,14 @@ import { marked } from 'marked';
 const changelogHtml = ref('');
 const changelogRaw = ref('');
 
+const parseChangelog = async () => {
+    try {
+        changelogHtml.value = await marked.parse(changelogRaw.value);
+    } catch (e) {
+        changelogHtml.value = '<p>Ошибка загрузки журнала изменений</p>';
+    }
+};
+
 interface DisplayMember extends CreditMember {
     username: string;
     avatarUrl: string;
@@ -134,17 +142,15 @@ watch(changelogRaw, async (newValue) => {
 
 onMounted(async () => {
     loadTeamData();
-    try {
-        const changelogUrl = new URL('./CHANGELOG.md', import.meta.url).href;
-        const response = await fetch(changelogUrl);
-        if (response.ok) {
-            changelogRaw.value = await response.text();
-        } else {
-            throw new Error('File not found');
-        }
-    } catch (e) {
-        console.error('Ошибка загрузки MD:', e);
-        changelogRaw.value = 'Не удалось загрузить журнал изменений.';
+    const modules = import.meta.glob('./**/*.md', { as: 'raw', eager: true });
+    console.log('Найденные MD модули:', Object.keys(modules));
+    const changelogKey = Object.keys(modules).find(key => key.endsWith('CHANGELOG.md'));
+    const rawContent = changelogKey ? modules[changelogKey] : null;
+
+    if (rawContent) {
+        changelogRaw.value = rawContent;
+    } else {
+        changelogRaw.value = 'Журнал изменений пуст или не найден...';
     }
 });
 </script>
@@ -207,21 +213,12 @@ onMounted(async () => {
     transition: var(--btn-transition);
 }
 
-.tech-link.ts {
-    color: var(--accent-blue);
-}
-
-.tech-link.ws {
-    color: var(--accent-blue);
-}
-
 .tech-link:hover {
     border-bottom-color: currentColor;
     opacity: 0.8;
 }
 
-.tech-tag.vue {
-    /*color: #42b883;*/
+.tech-tag, .tech-link {
     color: var(--accent-blue);
     font-weight: 700;
 }
@@ -307,7 +304,6 @@ onMounted(async () => {
     margin-top: 20px;
     padding: 15px 20px;
     background: rgba(255, 71, 87, 0.1);
-    /* Полупрозрачный красный */
     border: 1px solid rgba(255, 71, 87, 0.3);
     border-radius: var(--radius-sm);
     display: flex;
@@ -376,10 +372,6 @@ onMounted(async () => {
     .about-page {
         grid-template-columns: 1fr;
     }
-
-    .about-sidebar {
-        order: -1;
-    }
 }
 
 @media (max-width: 600px) {
@@ -394,3 +386,4 @@ onMounted(async () => {
     }
 }
 </style>
+

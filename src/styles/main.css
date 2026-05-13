@@ -43,7 +43,7 @@ option {
 .dropdown-divider {
     width: 100%;
     height: 1px;
-    background-color: black;
+    background-color: var(--glass-border);
     margin: 15px 0 10px 0;
 }
 
@@ -61,7 +61,11 @@ option {
     pointer-events: none;
 }
 
-a {
+a, button {
     -webkit-user-drag: none;
     user-select: none;
+}
+
+.text-muted {
+    color: var(--text-muted);
 }

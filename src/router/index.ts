@@ -1,9 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import RoomView from '@/views/Room/RoomView.vue';
+import NotFound from '@/views/NotFound/NotFoundView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
+        //  {
+        //    path: '/',
+        //    name: 'home',
+        //    component: () => import('@/views/Home/HomeView.vue')
+        //  },
         {
             path: '/admin',
             name: 'admin',
@@ -23,6 +29,21 @@ const router = createRouter({
             path: '/admin/users/:id',
             name: 'admin user details',
             component: () => import('@/views/Admin/AdminUserDetailsView.vue')
+        },
+        {
+            path: '/tools',
+            name: 'tools',
+            component: () => import('@/views/Tools/ToolsView.vue')
+        },
+        {
+            path: '/tools/canvas',
+            name: 'tools canvas',
+            component: () => import('@/views/Tools/ToolsCanvasView.vue')
+        },
+        {
+            path: '/tools/boards',
+            name: 'tools boards',
+            component: () => import('@/views/Tools/ToolsBoardsView.vue')
         },
         {
             path: '/',
@@ -45,6 +66,11 @@ const router = createRouter({
             name: 'profile',
             component: () => import('@/views/Profile/ProfileView.vue'),
         },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'NotFound',
+            component: NotFound
+        }
     ]
 })
 

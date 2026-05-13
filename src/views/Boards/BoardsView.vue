@@ -5,7 +5,7 @@
                 <header class="boards-header">
                     <div class="header-text">
                         <h1><i class="fa-solid fa-layer-group"></i> Доски</h1>
-                        <p v-if="!isLoading">Найдено: {{ filteredAndSortedBoards.length }}</p>
+                        <p v-if="!isLoading">Найдено досок: <b>{{ filteredAndSortedBoards.length }}</b></p>
                     </div>
 
                     <button @click="showModal = true" class="create-btn">
@@ -17,36 +17,54 @@
                 <div class="controls-panel">
                     <div class="tabs">
                         <button :class="{ active: activeTab === 'public' }" @click="activeTab = 'public'">
-                            <i class="fa-solid fa-globe"></i> Публичные
+                            <i class="fa-solid fa-globe"></i>
+                            <p>Публичные</p>
                         </button>
                         <button v-if="authState.isLoggedIn" :class="{ active: activeTab === 'private' }"
                             @click="activeTab = 'private'">
-                            <i class="fa-solid fa-lock"></i> Мои приватные
+                            <i class="fa-solid fa-lock"></i>
+                            <p>Мои приватные</p>
+                        </button>
+                        <button class="reload-btn" title="Перезагрузить список" @click="fetchBoards">
+                            <i class="fa-solid fa-arrow-rotate-right"></i>
+                            <p style="display: none;">Перезагрузить</p>
                         </button>
                     </div>
 
-                    <div class="sort-wrapper">
-                        <i class="fa-solid fa-arrow-down-wide-short"></i>
-                        <select v-model="sortBy" class="sort-select">
-                            <option value="new">Сначала новые</option>
-                            <option value="old">Сначала старые</option>
-                            <option value="abc">А — Я</option>
-                            <option value="zyx">Я — А</option>
-                            <option value="likes">По лайкам</option>
-                            <option value="popular">Популярные</option>
-                        </select>
+                    <div class="custom-select-container" v-click-outside="() => isSortOpen = false">
+                        <div class="select-trigger" @click="isSortOpen = !isSortOpen" :class="{ 'active': isSortOpen }">
+                            <i class="fa-solid fa-arrow-down-wide-short"></i>
+                            <span class="selected-value">{{ currentSortLabel }}</span>
+                            <i class="fa-solid fa-chevron-down arrow-icon" :class="{ 'rotated': isSortOpen }"></i>
+                        </div>
+
+                        <transition name="dropdown">
+                            <div v-if="isSortOpen" class="options-dropdown">
+                                <div v-for="option in sortOptions" :key="option.value" class="option-item"
+                                    :class="{ 'selected': sortBy === option.value }"
+                                    @click="handleSortChange(option.value)">
+                                    <i :class="option.icon"></i>
+                                    {{ option.label }}
+                                    <i v-if="sortBy === option.value" class="fa-solid fa-check check-mark"></i>
+                                </div>
+                            </div>
+                        </transition>
                     </div>
                 </div>
 
                 <div v-if="isLoading" class="loading-state">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i class="fa-solid fa-spinner fa-spin"></i>
                     <p>Загружаем холсты...</p>
                 </div>
 
                 <div v-else-if="filteredAndSortedBoards.length === 0" class="empty-state">
                     <i class="fa-solid fa-wind"></i>
                     <p v-if="activeTab === 'private'">У вас пока нет приватных досок</p>
-                    <p v-else>Досок не найдено...</p>
+                    <p v-else>
+                        {{ errorMessage ?
+                            'Ошибка загрузки досок. Проверьте подключение к Интернету и перезагрузите страницу.'
+                            : 'Досок не найдено...' }}
+                    </p>
                 </div>
 
                 <div v-else class="boards-grid">
@@ -54,7 +72,6 @@
                         @delete="removeBoard" />
                 </div>
             </div>
-
             <CreateBoardModal v-if="showModal" @close="showModal = false" @created="fetchBoards" />
         </div>
     </div>
@@ -70,7 +87,8 @@ import { socket } from '@/ts/utils/socket';
 import { useNotifications } from '@/ts/utils/notifications';
 import { ErrorRegistry, InfoRegistry } from '@/ts/utils/messages';
 import NotificationList from '@/components/notification/NotificationList.vue';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
+import { getTooltipText } from '@/ts/utils/tooltipText';
 
 const { addNotify } = useNotifications();
 
@@ -80,6 +98,25 @@ const isLoading = ref(true)
 const activeTab = ref<'public' | 'private'>('public');
 const sortBy = ref('new');
 const allBoards = ref<BoardPreview[]>([]);
+
+const errorMessage = ref(false)
+
+const isSortOpen = ref(false);
+const sortOptions = [
+    { value: 'new', label: 'Сначала новые', icon: 'fa-solid fa-calendar-plus' },
+    { value: 'old', label: 'Сначала старые', icon: 'fa-solid fa-calendar-minus' },
+    { value: 'abc', label: 'А — Я', icon: 'fa-solid fa-sort-alpha-down' },
+    { value: 'zyx', label: 'Я — А', icon: 'fa-solid fa-sort-alpha-up' },
+    { value: 'likes', label: 'По лайкам', icon: 'fa-solid fa-heart' },
+    { value: 'popular', label: 'Популярные', icon: 'fa-solid fa-fire' }
+];
+const currentSortLabel = computed(() => {
+    return sortOptions.find(opt => opt.value === sortBy.value)?.label || 'Сортировка';
+});
+const handleSortChange = (val: string) => {
+    sortBy.value = val;
+    isSortOpen.value = false;
+};
 
 const filteredAndSortedBoards = computed(() => {
     const currentUserId = authState.user?._id || authState.user?.id;
@@ -127,6 +164,7 @@ const fetchBoards = async () => {
         });
     } catch (e) {
         addNotify('error', ErrorRegistry.LOADING_ERROR);
+        errorMessage.value = true;
     } finally {
         isLoading.value = false;
     }
@@ -255,6 +293,7 @@ onMounted(fetchBoards);
     padding: 5px;
     border-radius: 12px;
     border: 1px solid var(--glass-border);
+    height: 40px;
 }
 
 .tabs button {
@@ -277,25 +316,107 @@ onMounted(fetchBoards);
     box-shadow: var(--card-shadow);
 }
 
-.sort-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text-main);
-    background: var(--input-bg);
-    padding: 0 15px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
+.reload-btn:hover {
+    color: var(--accent-blue);
+    transform: rotate(360deg) scale(1.1);
 }
 
-.sort-select {
-    background: none;
-    border: none;
-    color: var(--text-main);
-    padding: 12px 0;
-    font-weight: 600;
-    outline: none;
+.custom-select-container {
+    position: relative;
+    min-width: 200px;
+    user-select: none;
+}
+
+.select-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--input-bg);
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
     cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-main);
+}
+
+.select-trigger:hover,
+.select-trigger.active {
+    border-color: var(--accent-blue);
+    background: var(--card-bg);
+}
+
+.selected-value {
+    font-weight: 600;
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+.arrow-icon {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    transition: transform 0.3s ease;
+}
+
+.arrow-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.options-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    cursor: pointer;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.option-item i:not(.check-mark) {
+    width: 16px;
+    color: var(--accent-blue);
+    opacity: 0.7;
+}
+
+.option-item:hover {
+    background: var(--input-bg);
+    color: var(--text-main);
+}
+
+.option-item.selected {
+    color: var(--accent-blue);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.check-mark {
+    margin-left: auto;
+    font-size: 0.8rem;
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
 }
 
 /*@media (max-width: 768px) {
@@ -330,18 +451,23 @@ onMounted(fetchBoards);
     .controls-panel {
         gap: 12px;
         margin-bottom: 20px;
+        flex-direction: column;
     }
 
     .tabs {
         width: 100%;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
     }
 
     .tabs button {
         justify-content: center;
         padding: 12px 5px;
         font-size: 0.9rem;
+    }
+
+    .tabs button p {
+        display: none;
     }
 
     .sort-wrapper {
@@ -358,13 +484,17 @@ onMounted(fetchBoards);
         grid-template-columns: 1fr;
         gap: 20px;
     }
+
+    .custom-select-container {
+        min-width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
     .header-text h1 {
         font-size: 1.5rem;
     }
-    
+
     .header-text p {
         font-size: 0.9rem;
     }

@@ -18,7 +18,7 @@
             </div>
 
             <div class="card-content">
-                <h3 :title="board.title">{{ board.title }}</h3>
+                <h3>{{ board.title }}</h3>
 
                 <p class="author">
                     Автор:
@@ -26,7 +26,7 @@
                         <i class="fa-solid fa-user-nib"></i>
                         {{ board.creator?.username || 'Аноним' }}
                         <span v-if="['superadmin', 'admin', 'dev', 'mod'].includes(creatorRole)" class="verify-badge"
-                            :class="creatorRole" :data-tooltip="getTooltipText(creatorRole)">
+                            :class="creatorRole" :data-tooltip="getTooltipTextBadge(creatorRole)">
                             <i class="fa-solid fa-circle-check"></i>
                         </span>
                     </span>
@@ -39,7 +39,8 @@
 
                     <div class="actions">
                         <button @click.stop="toggleLike" :class="{ 'liked': isLiked }"
-                            :title="!isLiked ? 'Нравится' : 'Больше не нравится'" class="like-btn">
+                            :title="!isLiked ? 'Нравится' : 'Больше не нравится'" class="like-btn"
+                            :data-tooltip="!isLiked ? getTooltipText('Нравится') : getTooltipText('Больше не нравится')">
                             <i :class="isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                             {{ likesCount }}
                         </button>
@@ -64,8 +65,9 @@ import { api } from '@/ts/utils/api'
 import { ErrorRegistry, InfoRegistry } from '@/ts/utils/messages';
 import NotificationList from '../notification/NotificationList.vue';
 import ConfirmModal from '../modal/ConfirmModal.vue';
-import { getTooltipText } from '@/ts/utils/tooltipTextBadge';
-import { authState } from '@/ts/store/auth';
+import { getTooltipTextBadge } from '@/ts/utils/tooltipTextBadge';
+import { authState } from '@/ts/stores/auth';
+import { getTooltipText } from '@/ts/utils/tooltipText';
 
 const { addNotify } = useNotifications();
 
@@ -102,7 +104,7 @@ const deleteBoard = async () => {
         const savedUser = localStorage.getItem('user');
         const userId = savedUser ? JSON.parse(savedUser).id : null;
 
-        await api.delete(`https://drawing-server-mbnr.onrender.com/api/boards/${props.board._id}`, {
+        await api.delete(`http://localhost:5000/api/boards/${props.board._id}`, {
             data: { userId }
         });
 
@@ -126,7 +128,7 @@ const toggleLike = async () => {
     likesCount.value += isLiked.value ? 1 : -1;
 
     try {
-        const res = await api.post(`https://drawing-server-mbnr.onrender.com/api/boards/${props.board._id}/toggle-like`, {
+        const res = await api.post(`http://localhost:5000/api/boards/${props.board._id}/toggle-like`, {
             userId: currentUserId
         });
         likesCount.value = res.data.likesCount;
@@ -294,6 +296,32 @@ h3 {
     background: rgba(255, 71, 87, 0.1);
 }
 
+.like-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 17%;
+    left: 63%;
+    transform: translateX(-50%) translateY(5px);
+    padding: 5px 10px;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 9999;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.like-btn:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 .join-btn {
     background: var(--accent-blue);
     color: white;
@@ -454,6 +482,10 @@ h3 {
     .actions {
         width: 100%;
         justify-content: space-between;
+    }
+
+    .like-btn::after {
+        left: 10%;
     }
 
     .join-btn {

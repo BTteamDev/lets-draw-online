@@ -4,8 +4,10 @@
             <aside class="sidebar left-panel" :class="{ 'is-hidden': isLeftCollapsed }">
                 <div class="sidebar-header">
                     <div class="room-info">
-                        <h2 class="board-title" :title="boardTitle">
-                            <i class="fa-solid fa-chalkboard-user"></i> {{ boardTitle }}
+                        <h2 class="board-title">
+                            <i class="fa-solid fa-chalkboard-user"></i> <i v-if="!boardTitle"
+                                class="fa-solid fa-spinner fa-spin"></i>
+                            {{ boardTitle }}
                         </h2>
                         <span class="online-count">
                             <i class="fa-solid fa-circle"></i> {{ roomUsers.length }} в сети
@@ -37,7 +39,7 @@
 
                                 <span v-if="['superadmin', 'admin', 'dev', 'mod'].includes(user.systemRole)"
                                     class="verify-badge" :class="user.systemRole"
-                                    :data-tooltip="getTooltipText(user.systemRole)">
+                                    :data-tooltip="getTooltipTextBadge(user.systemRole)">
                                     <i class="fa-solid fa-circle-check"></i>
                                 </span>
                             </span>
@@ -51,7 +53,7 @@
                             </div>
                             <div class="staff-only-info"
                                 v-if="['superadmin', 'admin', 'mod'].includes(currentUserSystemRole)">
-                                <span id="user-email-admin-info"> • {{ user.email || 'no-email' }} </span>
+                                <span id="user-email-admin-info" :title="user.email"> • {{ user.email || 'no-email' }} </span>
                                 <span> [{{ user.id.substring(0, 4) }}] </span>
                             </div>
                         </div>
@@ -174,8 +176,8 @@ import type { UserProfile } from '@/ts/utils/interfaces';
 import { useNotifications } from '@/ts/utils/notifications';
 import { ErrorRegistry, InfoRegistry, SuccessRegistry } from '@/ts/utils/messages';
 import { api, boardAPI } from '@/ts/utils/api';
-import { authState } from '@/ts/store/auth';
-import { getTooltipText } from '@/ts/utils/tooltipTextBadge';
+import { authState } from '@/ts/stores/auth';
+import { getTooltipTextBadge } from '@/ts/utils/tooltipTextBadge';
 
 const { addNotify } = useNotifications();
 
@@ -186,12 +188,14 @@ const boardId = route.params.id as string;
 
 const lines = ref<Line[]>([]);
 const settings = ref({ color: '#000000', width: 5, tool: 'brush' as ToolType, opacity: 1 });
-const boardTitle = ref('...');
+const boardTitle = ref();
 const redoStack = ref<Line[]>([]);
 const isCollapsed = ref(false);
 const isLeftCollapsed = ref(false);
 const canvasComponent = ref<InstanceType<typeof ArtCanvas> | null>(null);
 const isSaving = ref(false);
+
+const blockWheel = true;
 
 const activeNoteId = ref<string | null>(null);
 
@@ -311,7 +315,7 @@ const currentUserSystemRole = computed(() => {
 
 const toggleBan = async (targetUser: any) => {
     try {
-        const res = await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${targetUser.id}/ban`, {}, {
+        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/ban`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
 
@@ -329,7 +333,7 @@ const toggleBan = async (targetUser: any) => {
 
 const toggleMute = async (targetUser: any) => {
     try {
-        const res = await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${targetUser.id}/mute`, {}, {
+        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/mute`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
         targetUser.isMuted = res.data.isMuted;
@@ -344,7 +348,7 @@ const toggleNote = (user: any) => {
 
 const saveNote = async (user: any) => {
     try {
-        await api.patch(`https://drawing-server-mbnr.onrender.com/api/admin/users/${user.id}/note`, {
+        await api.patch(`http://localhost:5000/api/admin/users/${user.id}/note`, {
             note: user.note
         }, {
             headers: { 'x-user-id': currentUserId }
@@ -435,9 +439,9 @@ onUnmounted(() => {
     flex-direction: column;
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
     z-index: 10;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                margin 0.3s ease, 
-                opacity 0.2s ease;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.3s ease,
+        opacity 0.2s ease;
 }
 
 .left-panel {
@@ -490,8 +494,13 @@ onUnmounted(() => {
     justify-content: center;
 }
 
-.expand-left-btn { left: 20px; }
-.expand-right-btn { right: 20px; }
+.expand-left-btn {
+    left: 20px;
+}
+
+.expand-right-btn {
+    right: 20px;
+}
 
 .collapse-btn,
 .expand-chat-btn {
@@ -627,10 +636,10 @@ onUnmounted(() => {
 }
 
 .avatar {
-    width: 40px; 
+    width: 40px;
     height: 40px;
     flex-shrink: 0;
-    
+
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--glass-border);
@@ -928,7 +937,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     padding: 30px;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .chat-section {
@@ -952,16 +961,21 @@ onUnmounted(() => {
         height: 100%;
         z-index: 200;
     }
-    
-    .left-panel { left: 0; }
-    .right-panel { right: 0; }
+
+    .left-panel {
+        left: 0;
+    }
+
+    .right-panel {
+        right: 0;
+    }
 
     .room-layout::before {
         content: '';
         display: v-bind('(!isCollapsed || !isLeftCollapsed) ? "block" : "none"');
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.3);
+        background: rgba(0, 0, 0, 0.3);
         z-index: 150;
     }
 }
@@ -970,12 +984,12 @@ onUnmounted(() => {
     .sidebar {
         width: 100%;
     }
-    
+
     .toolbar-container {
         padding: 10px;
         scale: 0.9;
     }
-    
+
     .art-board {
         padding: 10px;
     }

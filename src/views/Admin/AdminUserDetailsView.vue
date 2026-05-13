@@ -6,7 +6,7 @@
                     <div class="avatar-container">
                         <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" class="profile-avatar">
                         <div class="profile-avatar" v-if="!user.avatarUrl">{{ user.username?.[0]?.toUpperCase() || '?'
-                            }}
+                        }}
                         </div>
                     </div>
                     <div class="avatar-actions">
@@ -79,7 +79,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/ts/utils/api';
 import { useNotifications } from '@/ts/utils/notifications';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 import NotificationList from '@/components/notification/NotificationList.vue';
 import type { AdminUser } from '@/ts/utils/interfaces'
 

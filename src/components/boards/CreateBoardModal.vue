@@ -1,4 +1,5 @@
 <template>
+    <transition name="modal-fade">
     <div class="create-board-modal-template-wrapper">
         <div class="modal-overlay" @click.self="emit('close')">
             <div class="modal-content">
@@ -10,7 +11,7 @@
                 <div class="form-group">
                     <label><i class="fa-solid fa-signature"></i> Название</label>
                     <input class="input-modal" v-model="title" placeholder="Как назовем шедевр?"
-                        :disabled="isSubmitting" @keyup.enter="handleCreate" />
+                        :disabled="isSubmitting" @keyup.enter="handleCreate" maxlength="50"/>
                 </div>
 
                 <div class="form-group checkbox">
@@ -18,7 +19,7 @@
                         <input type="checkbox" id="private" v-model="isPrivate" />
                         <label for="private">
                             <i :class="isPrivate ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'"></i>
-                            Приватная доска (только для Вас)
+                            <p :style="isPrivate ? '' : 'text-decoration: line-through'">Приватная доска (только для Вас)</p>
                         </label>
                     </div>
                 </div>
@@ -37,6 +38,7 @@
         </div>
         <NotificationList />
     </div>
+    </transition>
 </template>
 
 <script setup lang="ts">

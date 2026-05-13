@@ -40,7 +40,8 @@
     --glass-border: rgba(255, 255, 255, 0.2);
     --glass-blur: blur(10px);
 
-    --input-bg: #f1f2f6;
+    --input-bg: #e4e5e9;
+    --input-bg-hover: color-mix(in srgb, var(--input-bg), #3498db 35%);
     --btn-transition: all 0.2s ease;
 }
 
@@ -80,6 +81,7 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-blur: blur(12px);
 
-    --input-bg: #1e293b;
+    --input-bg: #24344d9e;
+    --input-bg-hover: color-mix(in srgb, var(--input-bg), #238ab6 35%);
     --btn-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

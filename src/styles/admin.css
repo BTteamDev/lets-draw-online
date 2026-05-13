@@ -30,7 +30,7 @@
     text-transform: uppercase;
 }
 
-.role-badge.superadmin, .role-badge.admin {
+.role-badge.superadmin, .role-badge.admin, .role-badge.dev {
     background: var(--color-dev);
     color: white;
 }

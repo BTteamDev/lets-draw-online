@@ -1,6 +1,9 @@
 <template>
-    <div v-if="authState.user.role === 'superadmin'" style="color: red; font-size: 10px;">
-        Debug: isMuted = {{ isMuted }} (Type: {{ typeof isMuted }})
+    <div v-if="authState.user.role === 'superadmin'"
+        style="color: red; font-size: 10px; pointer-events: none; user-select: none; -webkit-user-drag: none;">
+        Debug:  <br>
+        ---------- isMuted = {{ isMuted }} (Type: {{ typeof isMuted }}) <br>
+        ---------- isShadowed = {{ isShadowed }} (Type: {{ typeof isShadowed }})
     </div>
     <div class="chat-container">
         <div class="messages-log" ref="messagesLog">
@@ -25,8 +28,7 @@
 
     <div class="chat-box" :class="{ 'is-muted': isMuted }">
         <div :class="['chat-switcher', { 'admin-mode': chatType === 'adm' }, { 'mod-mode': chatType === 'mod' }]"
-            @mousedown="!isMuted && switchChatType()"
-            :title="isMuted ? 'Чат заблокирован' : chatTypeTitle"
+            @mousedown="!isMuted && switchChatType()" :title="isMuted ? 'Чат заблокирован' : chatTypeTitle"
             :style="authState.user.role !== 'superadmin' && authState.user.role !== 'admin' && authState.user.role !== 'mod' ? 'cursor: auto' : ''">
             <i :class="{
                 'fa-solid fa-crown': chatType === 'adm',
@@ -51,7 +53,7 @@
 import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import type { ChatMessage, SystemRole } from '@/ts/utils/interfaces';
 import { socket } from '@/ts/utils/socket';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 import { useNotifications } from '@/ts/utils/notifications';
 import NotificationList from '../notification/NotificationList.vue';
 
@@ -69,7 +71,9 @@ const chatType = ref<'say' | 'adm' | 'mod'>('say');
 const messagesLog = ref<HTMLElement | null>(null);
 
 const localIsMuted = ref(false);
+const localIsShadowed = ref(false);
 const isMuted = computed(() => localIsMuted.value || authState.user?.isMuted || false);
+const isShadowed = computed(() => localIsShadowed.value || authState.user?.isShadowed || false);
 
 const scrollToBottom = async () => {
     await nextTick();
@@ -82,7 +86,7 @@ const switchChatType = () => {
     const role = authState.user.role;
     const isSA = role === 'superadmin';
     const isAdmin = role === 'admin';
-    const isMod = role === 'moderator'; 
+    const isMod = role === 'moderator';
 
     if (chatType.value === 'say') {
         if (isSA || isAdmin) {
@@ -314,32 +318,63 @@ onMounted(() => {
     color: var(--color-mod);
 }
 
+.chat-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 0 0 var(--radius-main) var(--radius-main);
+    padding: 10px 12px;
+    flex-shrink: 0;
+}
+
 .chat-box input {
     flex: 1;
+    min-width: 0;
     background: none;
     border: none;
     outline: none;
     color: #fff;
     font-size: 0.9rem;
+    padding: 5px 0;
 }
 
-.chat-box input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+.chat-switcher {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    min-width: 60px;
 }
 
 .send-btn {
+    flex-shrink: 0;
     background: none;
     border: none;
     color: var(--accent-blue);
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px;
-    transition: var(--btn-transition);
+    font-size: 1.2rem;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
-.send-btn:hover {
+.send-btn:hover:not(:disabled) {
     color: var(--accent-purple);
-    transform: scale(1.1) translateX(2px);
+    transform: scale(1.1) rotate(-10deg);
+}
+
+.send-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .is-muted input {
@@ -358,5 +393,23 @@ onMounted(() => {
     opacity: 0.5;
     filter: grayscale(1);
     pointer-events: none;
+}
+
+@media (max-width: 600px) {
+    .chat-box {
+        padding: 12px;
+    }
+
+    .type-label {
+        display: none;
+    }
+
+    .chat-switcher {
+        min-width: 40px;
+    }
+
+    .message {
+        font-size: 0.85rem;
+    }
 }
 </style>

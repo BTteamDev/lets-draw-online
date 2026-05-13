@@ -1,6 +1,9 @@
 <template>
     <div class="drawing-toolbar">
         <div class="tool-group">
+            <button :class="{ active: tool === 'hand' }" @click="emit('update:tool', 'hand')" title="Перемещение">
+                <i id="icon" class="fa-solid fa-hand"></i>
+            </button>
             <button :class="{ active: tool === 'brush' }" @click="emit('update:tool', 'brush')" title="Кисть">
                 <i class="fa-solid fa-paintbrush"></i>
             </button>
@@ -102,7 +105,7 @@ const downloadImage = () => {
     const canvas = document.querySelector('canvas');
     if (canvas) {
         const link = document.createElement('a');
-        link.download = 'my-art.png';
+        link.download = `Art-LetsDrawOnline-${canvas.toDataURL()}.png`;
         link.href = canvas.toDataURL();
         link.click();
     }
@@ -149,7 +152,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-    background: #e2e8f0;
+    background: color-mix(in srgb, var(--input-bg), white 35%);
     transform: translateY(-2px);
 }
 

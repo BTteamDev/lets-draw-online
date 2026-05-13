@@ -24,7 +24,7 @@ import { ref, onMounted } from 'vue';
 import { api } from '@/ts/utils/api';
 import { useNotifications } from '@/ts/utils/notifications';
 import NotificationList from '@/components/notification/NotificationList.vue';
-import { authState } from '@/ts/store/auth';
+import { authState } from '@/ts/stores/auth';
 
 const { addNotify } = useNotifications();
 

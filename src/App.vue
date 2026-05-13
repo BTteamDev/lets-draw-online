@@ -61,11 +61,11 @@
                 <div class="links">
                     <span class="copyright">&copy; {{ copyDate }} Let's Draw</span>
                     <div class="divider"></div>
-                    <a href="t.me/bodutop" title="Telegram" class="footer-link social"><i
+                    <a href="https://t.me/bodutop" title="Telegram" class="footer-link social"><i
                             class="fa-brands fa-telegram"></i></a>
-                    <a href="vk.ru/bodutop" title="VKontakte" class="footer-link social"><i
+                    <a href="https://vk.ru/bodutop" title="VKontakte" class="footer-link social"><i
                             class="fa-brands fa-vk"></i></a>
-                    <a href="x.com/bodutop" title="Twitter (X)" class="footer-link social"><i
+                    <a href="https://x.com/_BoDu_" title="Twitter (X)" class="footer-link social"><i
                             class="fa-brands fa-twitter"></i></a>
                 </div>
             </div>
@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { authState, logout as authLogout } from '@/ts/store/auth';
+import { authState, logout as authLogout } from '@/ts/stores/auth';
 import AuthForm from '@/components/auth/AuthForm.vue';
 import { appVersion } from './ts/version';
 import { socket } from './ts/utils/socket';
@@ -299,8 +299,6 @@ onMounted(() => {
     align-items: center;
     background-color: var(--accent-blue);
     color: white;
-
-
 }
 
 .logout-btn {
@@ -397,6 +395,12 @@ onMounted(() => {
     border-radius: 6px;
     border: 1px solid var(--glass-border);
     margin-right: 30px;
+    cursor: default;
+}
+
+.version-badge::selection {
+    background-color: rgba(255, 255, 255, 0.242);
+    color: var(--text-muted);
 }
 
 fade-enter-active,
@@ -413,6 +417,10 @@ fade-enter-active,
     .main-header {
         padding: 0 15px;
         height: 60px;
+    }
+
+    .main-header .logo, .main-nav, .user-actions {
+        transform: scale(0.77);
     }
 
     .logo h1 {

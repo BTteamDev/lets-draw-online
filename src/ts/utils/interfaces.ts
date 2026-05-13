@@ -1,6 +1,6 @@
 export type SystemRole = 'superadmin' | 'admin' | 'dev' | 'mod' | 'editor' | 'viewer';
 export type RoomRole = 'owner' | 'editor' | 'viewer';
-export type ToolType = 'brush' | 'eraser' | 'rect' | 'circle' | 'line' | 'picker';
+export type ToolType = 'brush' | 'eraser' | 'rect' | 'circle' | 'line' | 'picker' | 'hand';
 export type NotifyType = 'error' | 'warning' | 'info' | 'success';
 
 export interface UserTag {
@@ -35,6 +35,7 @@ export interface AdminUser {
     note?: string;
     isBanned?: boolean;
     isMuted?: boolean;
+    lastIp: string;
 }
 
 export interface ChatMessage {
