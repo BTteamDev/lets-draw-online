@@ -1,2 +1,2 @@
 import { io } from 'socket.io-client';
-export const socket = io('https://lets-draw-online.vercel.app/');
+export const socket = io('https://drawing-server-mbnr.onrender.com/');
