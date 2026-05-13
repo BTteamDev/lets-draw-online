@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const api = axios.create({ baseURL: 'http://localhost:5000/api' });
+export const api = axios.create({ baseURL: 'https://lets-draw-online.vercel.app/api' });
 
 export const drawingAPI = {
     save(drawingData: any) {

@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "https://lets-draw-online.vercel.app/",
         methods: ["GET", "POST"]
     }
 });
@@ -275,5 +275,5 @@ setInterval(() => {
 }, 3000);
 
 server.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
+    console.log(`Сервер запущен на https://lets-draw-online.vercel.app:${PORT}`);
 }); 

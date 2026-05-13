@@ -315,7 +315,7 @@ const currentUserSystemRole = computed(() => {
 
 const toggleBan = async (targetUser: any) => {
     try {
-        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/ban`, {}, {
+        const res = await api.patch(`https://lets-draw-online.vercel.app/api/admin/users/${targetUser.id}/ban`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
 
@@ -333,7 +333,7 @@ const toggleBan = async (targetUser: any) => {
 
 const toggleMute = async (targetUser: any) => {
     try {
-        const res = await api.patch(`http://localhost:5000/api/admin/users/${targetUser.id}/mute`, {}, {
+        const res = await api.patch(`https://lets-draw-online.vercel.app/api/admin/users/${targetUser.id}/mute`, {}, {
             headers: { 'x-user-id': currentUserId }
         });
         targetUser.isMuted = res.data.isMuted;
@@ -348,7 +348,7 @@ const toggleNote = (user: any) => {
 
 const saveNote = async (user: any) => {
     try {
-        await api.patch(`http://localhost:5000/api/admin/users/${user.id}/note`, {
+        await api.patch(`https://lets-draw-online.vercel.app/api/admin/users/${user.id}/note`, {
             note: user.note
         }, {
             headers: { 'x-user-id': currentUserId }

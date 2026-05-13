@@ -104,7 +104,7 @@ const deleteBoard = async () => {
         const savedUser = localStorage.getItem('user');
         const userId = savedUser ? JSON.parse(savedUser).id : null;
 
-        await api.delete(`http://localhost:5000/api/boards/${props.board._id}`, {
+        await api.delete(`https://lets-draw-online.vercel.app/api/boards/${props.board._id}`, {
             data: { userId }
         });
 
@@ -128,7 +128,7 @@ const toggleLike = async () => {
     likesCount.value += isLiked.value ? 1 : -1;
 
     try {
-        const res = await api.post(`http://localhost:5000/api/boards/${props.board._id}/toggle-like`, {
+        const res = await api.post(`https://lets-draw-online.vercel.app/api/boards/${props.board._id}/toggle-like`, {
             userId: currentUserId
         });
         likesCount.value = res.data.likesCount;
