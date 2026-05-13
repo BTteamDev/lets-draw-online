@@ -31,21 +31,6 @@ const router = createRouter({
             component: () => import('@/views/Admin/AdminUserDetailsView.vue')
         },
         {
-            path: '/tools',
-            name: 'tools',
-            component: () => import('@/views/Tools/ToolsView.vue')
-        },
-        {
-            path: '/tools/canvas',
-            name: 'tools canvas',
-            component: () => import('@/views/Tools/ToolsCanvasView.vue')
-        },
-        {
-            path: '/tools/boards',
-            name: 'tools boards',
-            component: () => import('@/views/Tools/ToolsBoardsView.vue')
-        },
-        {
             path: '/',
             name: 'boards',
             component: () => import('@/views/Boards/BoardsView.vue')
