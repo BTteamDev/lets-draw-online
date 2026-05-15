@@ -26,6 +26,7 @@
                 </nav>
 
                 <div class="user-actions">
+                    <NotificationBell/>
                     <button @click="toggleTheme" class="theme-toggle"
                         :title="darkTheme ? 'Светлая тема' : 'Темная тема'">
                         <i v-if="darkTheme" class="fa-solid fa-sun"></i>
@@ -84,9 +85,12 @@ import AuthForm from '@/components/auth/AuthForm.vue';
 import { appVersion } from './ts/version';
 import { socket } from './ts/utils/socket';
 import { useNotifications } from './ts/utils/notifications';
-import NotificationList from './components/notification/NotificationList.vue';
+import NotificationList from '@/components/notification/NotificationList.vue';
+import NotificationBell from '@/components/notification/NotificationBell.vue';
+import { useNotificationHub } from './ts/utils/useNotificationHub';
 
 const { addNotify } = useNotifications();
+const { fetchNotifications, pushLocal } = useNotificationHub();
 
 const darkTheme = ref(false);
 const date = new Date;
@@ -119,17 +123,32 @@ const logout = () => {
     authLogout();
 };
 
-onMounted(() => {
+onMounted(async () => {
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'dark' || (!currentTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         darkTheme.value = true;
         document.documentElement.setAttribute('data-theme', 'dark');
     }
 
+    if (authState.user) {
+        const userId = authState.user._id || authState.user.id;
+        socket.emit('register-self', userId);
+
+        await fetchNotifications();
+        socket.on('new_notification', (notification) => {
+            pushLocal(notification);
+        });
+
+    }
+
     socket.on('user_banned_force_logout', () => {
         addNotify('error', 'Сессия завершена администратором', 10000);
         logout();
-        window.location.href = `/login?error=your_account_banne?id=${authState.user._id}`;
+        window.location.href = `/login?error=banned&id=${authState.user?._id}`;
+    });
+
+    socket.on('admin_alert', ({ message }: { message: string }) => {
+        addNotify('warning', `Сообщение от администрации: ${message}`, 0);
     });
 });
 </script>
@@ -419,7 +438,9 @@ fade-enter-active,
         height: 60px;
     }
 
-    .main-header .logo, .main-nav, .user-actions {
+    .main-header .logo,
+    .main-nav,
+    .user-actions {
         transform: scale(0.77);
     }
 

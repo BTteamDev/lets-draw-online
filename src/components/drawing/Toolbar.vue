@@ -27,17 +27,17 @@
         <div class="divider"></div>
 
         <div class="tool-group settings">
-            <div class="input-wrapper">
-                <i class="fa-solid fa-palette icon-label"></i>
-                <input type="color" :value="color" :disabled="tool === 'eraser'"
-                    @input="e => emit('update:color', (e.target as HTMLInputElement).value)" />
-            </div>
+            <ColorSelector 
+                :modelValue="color"
+                :disabled="tool === 'eraser'"
+                @update:modelValue="e => emit('update:color', e)"
+                />
 
-            <div class="slider-wrapper">
-                <i class="fa-solid fa-circle-half-stroke icon-label"></i>
-                <input type="range" min="0.1" max="1" step="0.1" :value="opacity"
-                    @input="e => emit('update:opacity', Number((e.target as HTMLInputElement).value))" />
-            </div>
+                <div class="slider-wrapper">
+                    <i class="fa-solid fa-circle-half-stroke icon-label"></i>
+                    <input type="range" min="0.1" max="1" step="0.1" :value="opacity"
+                        @input="e => emit('update:opacity', Number((e.target as HTMLInputElement).value))" />
+                </div>
         </div>
 
         <div class="divider"></div>
@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import ColorSelector from './ColorSelector.vue';
 import type { ToolType, UserProfile } from '@/ts/utils/interfaces';
 import { computed, ref } from 'vue';
 

@@ -13,13 +13,25 @@
                                 <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" class="profile-avatar">
                                 <div class="profile-avatar" v-if="!user.avatarUrl">{{ user.username[0]?.toUpperCase() }}
                                 </div>
-                                <label class="upload-overlay" for="avatar-input">
+                                <label v-if="!isAvatarLocked" class="upload-overlay" for="avatar-input">
                                     <i class="fa-solid fa-camera"></i>
                                 </label>
+                                <div v-else class="upload-overlay locked-overlay">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
                                 <input type="file" id="avatar-input" hidden @change="handleAvatarUpload"
                                     accept="image/*">
                             </div>
-                            <p class="upload-hint">Нажмите, чтобы изменить фото</p>
+                            <p class="upload-hint">
+                                <span v-if="isAvatarLocked" style="color: var(--color-danger)">
+                                    <i class="fa-solid fa-lock"></i> Смена аватара заблокирована администратором
+                                </span>
+                                <span v-else>Нажмите, чтобы изменить фото</span>
+                            </p>
+
+                            <button v-if="user.avatarUrl" @click="deleteAvatar" class="avatar-action-btn danger">
+                                <i class="fa-solid fa-trash-can"></i> Удалить фото
+                            </button>
                         </div>
 
                         <div class="form-group">
@@ -124,6 +136,7 @@ const user = computed(() => {
 const tempUsername = ref('');
 const isSaving = ref(false);
 const isLoadingBoards = ref(true);
+const isAvatarLocked = computed(() => authState.user?.isAvatarLocked ?? false);
 const activeTab = ref<'public' | 'private'>('public');
 const myBoards = ref<any[]>([]);
 
@@ -135,6 +148,10 @@ onMounted(async () => {
 });
 
 const handleAvatarUpload = async (e: Event) => {
+    if (isAvatarLocked.value) {
+        addNotify('error', 'Смена аватара заблокирована администратором');
+        return;
+    }
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
@@ -165,6 +182,25 @@ const handleAvatarUpload = async (e: Event) => {
     };
 
     reader.readAsDataURL(file);
+};
+
+const deleteAvatar = async () => {
+    if (!confirm('Удалить аватар?')) return;
+    try {
+        await userAPI.updateProfile({
+            userId: user.value.id,
+            avatarUrl: ''
+        });
+
+        if (authState.user) {
+            authState.user.avatarUrl = '';
+            localStorage.setItem('user', JSON.stringify(authState.user));
+        }
+
+        addNotify('success', 'Аватар удалён');
+    } catch (e) {
+        addNotify('error', 'Не удалось удалить аватар');
+    }
 };
 
 const fetchMyBoards = async () => {
@@ -529,6 +565,36 @@ watch(() => authState.user, (newUser) => {
 .action-btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
+}
+
+.locked-overlay {
+    opacity: 1 !important;
+    background: rgba(255, 71, 87, 0.4);
+    cursor: not-allowed;
+}
+
+.avatar-action-btn {
+    margin-top: 10px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--btn-transition);
+}
+
+.avatar-action-btn.danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--color-danger);
+}
+
+.avatar-action-btn.danger:hover {
+    background: var(--color-danger);
+    color: white;
 }
 
 @media (max-width: 900px) {

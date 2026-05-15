@@ -53,7 +53,8 @@
                             </div>
                             <div class="staff-only-info"
                                 v-if="['superadmin', 'admin', 'mod'].includes(currentUserSystemRole)">
-                                <span id="user-email-admin-info" :title="user.email"> • {{ user.email || 'no-email' }} </span>
+                                <span id="user-email-admin-info" :title="user.email"> • {{ user.email || 'no-email' }}
+                                </span>
                                 <span> [{{ user.id.substring(0, 4) }}] </span>
                             </div>
                         </div>
@@ -133,7 +134,7 @@
                 </button>
                 <div class="toolbar-container">
                     <Toolbar v-model:color="settings.color" v-model:width="settings.width" v-model:tool="settings.tool"
-                        v-model:opacity="settings.opacity" :is-saving="isSaving" :can-undo="lines.length > 0"
+                        v-model:opacity="settings.opacity" :is-saving="isSaving" :can-undo="myLineIds.length > 0"
                         :can-redo="redoStack.length > 0" @undo="handleUndo" @redo="handleRedo" @clear="() => lines = []"
                         @save="handleSave" />
                 </div>
@@ -180,6 +181,14 @@ import { authState } from '@/ts/stores/auth';
 import { getTooltipTextBadge } from '@/ts/utils/tooltipTextBadge';
 
 const { addNotify } = useNotifications();
+import { useHotkeys } from '@/ts/utils/useHotkeys';
+
+useHotkeys({
+    'ctrl+z': () => handleUndo(),
+    'ctrl+y': () => handleRedo(),
+    'meta+z': () => handleUndo(),
+    'meta+shift+z': () => handleRedo(),
+});
 
 const route = useRoute();
 const roomId = route.params.id as string;
@@ -195,9 +204,9 @@ const isLeftCollapsed = ref(false);
 const canvasComponent = ref<InstanceType<typeof ArtCanvas> | null>(null);
 const isSaving = ref(false);
 
-const blockWheel = true;
-
 const activeNoteId = ref<string | null>(null);
+
+const myLineIds = ref<string[]>([]);
 
 const handleSave = async () => {
     if (isSaving.value) return;
@@ -293,9 +302,16 @@ onMounted(() => {
         lines.value.push(newLine);
     });
 
-    socket.on('undo-line-confirmed', () => {
-        lines.value.pop();
+    socket.on('undo-line-confirmed', ({ lineId }: { lineId: string }) => {
+        lines.value = lines.value.filter(l => l.id !== lineId);
     });
+
+    socket.on('redo-line-confirmed', (line: Line) => {
+        if (!lines.value.find(l => l.id === line.id)) {
+            lines.value.push(line);
+        }
+    });
+
 
     socket.on('kicked', () => {
         addNotify('error', ErrorRegistry.KICKED, 0);
@@ -372,24 +388,33 @@ const changeRole = (targetUserId: string, newRole: string) => {
 };
 
 const handleUndo = () => {
-    if (lines.value.length === 0) return;
+    const lastOwnId = myLineIds.value[myLineIds.value.length - 1];
+    if (!lastOwnId) return;
 
-    const lastLine = lines.value.pop();
-    if (lastLine) {
-        redoStack.value.push(lastLine);
-        socket.emit('undo-line', { roomId });
+    let lineIndex = -1;
+    for (let i = lines.value.length - 1; i >= 0; i--) {
+        if (lines.value[i]?.id === lastOwnId) {
+            lineIndex = i;
+            break;
+        }
     }
+    if (lineIndex === -1) return;
+
+    const removed = lines.value[lineIndex] as Line;
+    lines.value.splice(lineIndex, 1);
+    myLineIds.value.pop();
+    redoStack.value.push(removed);
+    socket.emit('undo-line', { roomId, userId: currentUserId });
 };
 
 const handleRedo = () => {
     if (redoStack.value.length === 0) return;
-
-    const lineToRestore = redoStack.value.pop();
-    if (lineToRestore) {
-        lines.value.push(lineToRestore);
-        socket.emit('draw-line', { roomId, line: lineToRestore });
-    }
+    const lineToRestore = redoStack.value.pop()!;
+    lines.value.push(lineToRestore);
+    myLineIds.value.push(lineToRestore.id!);
+    socket.emit('redo-line', { roomId, line: lineToRestore });
 };
+
 
 const kickUser = (targetUserId: string) => {
     if (currentUserRole.value !== 'owner') return;
@@ -404,10 +429,17 @@ const handleLineFinished = (line: Line) => {
         addNotify('warning', ErrorRegistry.NO_PERMISSION);
         return;
     }
-    lines.value.push(line);
+    const fullLine: Line = {
+        ...line,
+        id: crypto.randomUUID(),
+        userId: currentUserId
+    };
+    lines.value.push(fullLine);
+    myLineIds.value.push(fullLine.id!);
     redoStack.value = [];
-    socket.emit('draw-line', { roomId, line });
+    socket.emit('draw-line', { roomId, line: fullLine });
 };
+
 
 onUnmounted(() => {
     if (window.innerWidth < 1024) {
@@ -925,6 +957,8 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    z-index: 10;
 }
 
 .chat-collapsed .toolbar-container {

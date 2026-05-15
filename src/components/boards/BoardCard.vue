@@ -18,7 +18,7 @@
             </div>
 
             <div class="card-content">
-                <h3>{{ board.title }}</h3>
+                <h3 :title="board.title">{{ board.title }}</h3>
 
                 <p class="author">
                     Автор:

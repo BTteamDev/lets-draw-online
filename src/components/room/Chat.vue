@@ -1,7 +1,7 @@
 <template>
     <div v-if="authState.user.role === 'superadmin'"
         style="color: red; font-size: 10px; pointer-events: none; user-select: none; -webkit-user-drag: none;">
-        Debug:  <br>
+        Debug: <br>
         ---------- isMuted = {{ isMuted }} (Type: {{ typeof isMuted }}) <br>
         ---------- isShadowed = {{ isShadowed }} (Type: {{ typeof isShadowed }})
     </div>

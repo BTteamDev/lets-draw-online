@@ -35,6 +35,7 @@ export interface AdminUser {
     note?: string;
     isBanned?: boolean;
     isMuted?: boolean;
+    isShadowed?: boolean;
     lastIp: string;
 }
 
@@ -50,6 +51,9 @@ export interface ChatMessage {
 export interface DrawPoint {
     x: number;
     y: number;
+    pressure?: number;
+    tiltX?: number;
+    tiltY?: number;
 }
 
 export interface StrokeSettings {
@@ -58,6 +62,8 @@ export interface StrokeSettings {
 }
 
 export interface Line {
+    id?: string;
+    userId?: string;
     points: DrawPoint[];
     color: string;
     width: number;
